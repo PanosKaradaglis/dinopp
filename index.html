@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secret Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Calm, Starry Colors */
+        :root {
+            --color-bg-dark: #020617; /* Very dark slate */
+            --color-night: #1e1b4b; /* Deep indigo */
+            --color-starlight: #e2e8f0; /* Soft silver */
+            --color-accent: #818cf8; /* Soft indigo accent */
+        }
+
+        body {
+            font-family: 'Comfortaa', display, cursive;
+            background: radial-gradient(circle at center, var(--color-night) 0%, var(--color-bg-dark) 100%);
+            color: var(--color-starlight);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Gentle Stars Effect */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background-image: 
+                radial-gradient(1.5px 1.5px at 20px 30px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.6), rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 50px 160px, rgba(255,255,255,0.9), rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 40px, rgba(255,255,255,0.5), rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 130px 80px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.4), rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: twinkle 6s infinite alternate;
+            opacity: 0.6;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.4; }
+            100% { opacity: 0.8; }
+        }
+
+        /* Soft Glassmorphism */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-radius: 2rem;
+        }
+
+        .starlight-text {
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            font-weight: 300;
+        }
+
+        /* Input & Button Styles */
+        .custom-input {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            transition: all 0.4s ease;
+            border-radius: 9999px; /* Fully rounded */
+        }
+        .custom-input:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 15px rgba(129, 140, 248, 0.3);
+        }
+
+        .custom-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: all 0.4s ease;
+            border-radius: 9999px;
+            backdrop-filter: blur(5px);
+        }
+        .custom-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 3D Cards */
+        .scene {
+            perspective: 1000px;
+            width: 260px;
+            height: 380px;
+            margin: 1rem;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card__face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2rem;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Front of card (The ? mark) */
+        .card__face--front {
+            background: linear-gradient(135deg, rgba(30, 27, 75, 0.6), rgba(2, 6, 23, 0.8));
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .card__face--front::after {
+            content: '?';
+            font-weight: 300; /* Makes it look extremely soft and rounded */
+            font-size: 7rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Back of card (The Revealed text) */
+        .card__face--back {
+            background: radial-gradient(circle at center, rgba(129, 140, 248, 0.15) 0%, rgba(2, 6, 23, 0.95) 100%);
+            transform: rotateY(180deg);
+            box-shadow: 0 0 30px rgba(129, 140, 248, 0.2);
+        }
+
+        .card-text {
+            font-size: 3rem;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.05em;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Dinosaur Doodles */
+        .doodle {
+            position: fixed;
+            opacity: 0.07;
+            color: white;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .doodle svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .doodle-1 { top: 15%; left: 8%; width: 140px; transform: rotate(-10deg); }
+        .doodle-2 { bottom: 20%; right: 10%; width: 120px; transform: rotate(15deg); }
+        .doodle-3 { top: 65%; left: 85%; width: 100px; transform: rotate(25deg); }
+        .doodle-4 { bottom: 10%; left: 25%; width: 90px; transform: rotate(-5deg); }
+
+        /* Transitions */
+        .fade-transition {
+            transition: opacity 1s ease, transform 1s ease;
+        }
+        .hidden-screen {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px);
+            position: absolute;
+            width: 100%;
+        }
+        .active-screen {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Shake animation for errors */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            50% { transform: translateX(8px); }
+            75% { transform: translateX(-8px); }
+        }
+        .shake-animation {
+            animation: shake 0.4s ease-in-out;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center relative">
+
+    <!-- Stars Background -->
+    <div class="stars"></div>
+
+    <!-- Dinosaur Background Doodles -->
+    <!-- Brontosaurus -->
+    <div class="doodle doodle-1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M 5 20 L 5 15 C 5 9 8 4 12 4 C 14 4 15 5 15 6 L 18 6 C 19 6 20 7 20 9 C 20 11 18 13 16 13 L 15 13 C 15 15 17 17 19 17 L 19 20 L 16 20 L 16 16 L 13 16 L 13 20 L 10 20 L 10 16 L 8 16 L 8 20 Z" />
+        </svg>
+    </div>
+    <!-- Stegosaurus -->
+    <div class="doodle doodle-2">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M 3 17 C 3 12 8 9 14 9 C 18 9 21 11 21 15 L 21 17 L 18 17 L 18 15 L 15 15 L 15 17 L 12 17 L 12 15 L 9 15 L 9 17 Z" />
+            <path d="M 6 9 L 8 4 L 10 9" />
+            <path d="M 11 8 L 13 3 L 15 8" />
+            <path d="M 16 9 L 18 5 L 19 9" />
+        </svg>
+    </div>
+    <!-- Pterodactyl (Flying) -->
+    <div class="doodle doodle-3">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M 2 12 C 6 8 10 10 12 12 C 14 10 18 8 22 12 C 18 14 14 14 12 12 C 10 14 6 14 2 12 Z" />
+            <path d="M 12 12 L 14 8 L 10 8 Z" />
+        </svg>
+    </div>
+    <!-- Tiny Track/Doodle -->
+    <div class="doodle doodle-4">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M 12 20 C 8 20 6 16 6 12 C 6 8 10 4 12 4 C 14 4 18 8 18 12 C 18 16 16 20 12 20 Z" />
+            <circle cx="12" cy="12" r="2" />
+        </svg>
+    </div>
+
+    <!-- SCREEN 1: LOGIN -->
+    <div id="login-screen" class="active-screen fade-transition w-full max-w-md px-6 flex flex-col items-center text-center">
+        <div class="glass-panel p-10 w-full">
+            <h1 class="text-4xl starlight-text mb-3">Welcome</h1>
+            <p class="text-gray-300 mb-8 text-sm opacity-80">Enter the secret code to continue.</p>
+            
+            <input type="password" id="password-input" placeholder="Password..." 
+                class="custom-input w-full px-5 py-3 text-center text-xl mb-4 tracking-widest placeholder-gray-400">
+            
+            <p id="error-message" class="text-red-300 text-sm mb-4 h-5 opacity-0 transition-opacity">Incorrect password! Please try again.</p>
+            
+            <button onclick="checkPassword()" class="custom-btn w-full font-bold py-3 text-lg tracking-wider">
+                Reveal
+            </button>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: CARDS (Initially hidden) -->
+    <div id="main-screen" class="hidden-screen fade-transition w-full min-h-screen flex flex-col items-center justify-center py-12 z-10">
+        <h2 class="text-4xl md:text-5xl starlight-text mb-16 text-center px-4">Choose your Dino card</h2>
+        
+        <div id="cards-container" class="flex flex-wrap justify-center items-center gap-8 max-w-6xl">
+            <!-- Card 1 -->
+            <div class="scene">
+                <div class="card" onclick="flipCard(this)">
+                    <div class="card__face card__face--front">
+                        <div class="absolute top-8 flex flex-col items-center opacity-60">
+                            <svg class="w-10 h-10 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M 5 20 L 5 15 C 5 9 8 4 12 4 C 14 4 15 5 15 6 L 18 6 C 19 6 20 7 20 9 C 20 11 18 13 16 13 L 15 13 C 15 15 17 17 19 17 L 19 20 L 16 20 L 16 16 L 13 16 L 13 20 L 10 20 L 10 16 L 8 16 L 8 20 Z" />
+                            </svg>
+                            <span class="text-[0.65rem] tracking-[0.2em] uppercase font-bold">Brontosaurus</span>
+                        </div>
+                        <p class="absolute bottom-8 text-white/50 text-xs tracking-[0.2em] uppercase">Card I</p>
+                    </div>
+                    <div class="card__face card__face--back">
+                        <span class="card-text"><a href="https://apps.facebook.com/dodcommunity/?ref=bookmarks&fb_source=web_shortcut&count=0" target="_blank" class="hover:opacity-80 transition-opacity" onclick="event.stopPropagation()">DOD</a></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="scene">
+                <div class="card" onclick="flipCard(this)">
+                    <div class="card__face card__face--front">
+                        <div class="absolute top-8 flex flex-col items-center opacity-60">
+                            <svg class="w-10 h-10 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M 3 17 C 3 12 8 9 14 9 C 18 9 21 11 21 15 L 21 17 L 18 17 L 18 15 L 15 15 L 15 17 L 12 17 L 12 15 L 9 15 L 9 17 Z" />
+                                <path d="M 6 9 L 8 4 L 10 9" />
+                                <path d="M 11 8 L 13 3 L 15 8" />
+                                <path d="M 16 9 L 18 5 L 19 9" />
+                            </svg>
+                            <span class="text-[0.65rem] tracking-[0.2em] uppercase font-bold">Stegosaurus</span>
+                        </div>
+                        <p class="absolute bottom-8 text-white/50 text-xs tracking-[0.2em] uppercase">Card II</p>
+                    </div>
+                    <div class="card__face card__face--back">
+                        <span class="card-text text-4xl"><a href="https://app.kosmi.io/room/ds0nju" target="_blank" class="hover:opacity-80 transition-opacity" onclick="event.stopPropagation()">KOSMI</a></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="scene">
+                <div class="card" onclick="flipCard(this)">
+                    <div class="card__face card__face--front">
+                        <div class="absolute top-8 flex flex-col items-center opacity-60">
+                            <svg class="w-10 h-10 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M 21 11.5 C 18 9 13 10 9 12 C 6 13.5 3 13 1 11.5 C 1.5 14 4 15.5 8 14 C 12 12.5 17 12 21 11.5 Z" />
+                                <path d="M 1 11.5 L 0 8.5 L 2.5 10.5 L 4 7.5 L 3.5 12" />
+                                <path d="M 11 13 L 10 16.5 L 13 14" />
+                                <circle cx="17.5" cy="11.5" r="0.5" fill="currentColor" />
+                            </svg>
+                            <span class="text-[0.65rem] tracking-[0.2em] uppercase font-bold">Basilosaurus</span>
+                        </div>
+                        <p class="absolute bottom-8 text-white/50 text-xs tracking-[0.2em] uppercase">Card III</p>
+                    </div>
+                    <div class="card__face card__face--back">
+                        <span class="card-text">LORE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shuffle Button -->
+        <button onclick="reshuffleAll()" class="custom-btn mt-16 px-6 py-3 text-sm font-bold tracking-widest uppercase flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Shuffle
+        </button>
+    </div>
+
+    <!-- Logic -->
+    <script>
+        document.getElementById("password-input").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                checkPassword();
+            }
+        });
+
+        function checkPassword() {
+            const password = document.getElementById('password-input').value.trim();
+            const errorMessage = document.getElementById('error-message');
+            const loginBox = document.querySelector('.glass-panel');
+
+            if (password.toLowerCase() === 'dinopp') {
+                errorMessage.style.opacity = '0';
+                
+                const loginScreen = document.getElementById('login-screen');
+                const mainScreen = document.getElementById('main-screen');
+
+                loginScreen.classList.remove('active-screen');
+                loginScreen.classList.add('hidden-screen');
+
+                // Shuffle the cards every time the user logs in
+                shuffleCards();
+
+                setTimeout(() => {
+                    loginScreen.style.display = 'none';
+                    mainScreen.classList.remove('hidden-screen');
+                    mainScreen.classList.add('active-screen');
+                }, 1000); 
+                
+            } else {
+                errorMessage.style.opacity = '1';
+                loginBox.classList.remove('shake-animation');
+                void loginBox.offsetWidth;
+                loginBox.classList.add('shake-animation');
+            }
+        }
+
+        // Global flag to track if a card is currently selected
+        let isCardSelected = false;
+
+        function shuffleCards() {
+            const container = document.getElementById('cards-container');
+            for (let i = container.children.length; i >= 0; i--) {
+                container.appendChild(container.children[Math.random() * i | 0]);
+            }
+        }
+
+        let isShuffling = false;
+
+        function reshuffleAll() {
+            if (isShuffling) return; // Prevent spamming the button
+            isShuffling = true;
+            isCardSelected = false;
+
+            // 1. Unflip all cards and reset their visual state
+            const allCards = document.querySelectorAll('.card');
+            allCards.forEach(c => {
+                c.classList.remove('is-flipped');
+                c.style.opacity = '1';
+                c.style.pointerEvents = 'auto';
+            });
+
+            // 2. Wait for the cards to face down, then randomize the words and their order
+            setTimeout(() => {
+                const outcomes = [
+                    { text: "DOD", url: "https://apps.facebook.com/dodcommunity/?ref=bookmarks&fb_source=web_shortcut&count=0" },
+                    { text: "KOSMI", url: "https://app.kosmi.io/room/ds0nju" },
+                    { text: "LORE", url: null }
+                ];
+                
+                // Shuffle the outcomes array randomly
+                for (let i = outcomes.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [outcomes[i], outcomes[j]] = [outcomes[j], outcomes[i]];
+                }
+
+                // Apply the randomized words to the backs of the cards
+                const backTexts = document.querySelectorAll('.card-text');
+                backTexts.forEach((span, index) => {
+                    const outcome = outcomes[index];
+                    
+                    if (outcome.url) {
+                        span.innerHTML = `<a href="${outcome.url}" target="_blank" class="hover:opacity-80 transition-opacity" onclick="event.stopPropagation()">${outcome.text}</a>`;
+                    } else {
+                        span.innerHTML = outcome.text;
+                    }
+
+                    // Adjust sizing for the longer word
+                    if (outcome.text === "KOSMI") {
+                        span.classList.add("text-4xl");
+                    } else {
+                        span.classList.remove("text-4xl");
+                    }
+                });
+
+                // Shuffle their physical placement in the DOM again
+                shuffleCards();
+                
+                isShuffling = false;
+            }, 600); // 600ms matches the time it takes to flip back
+        }
+
+        function flipCard(cardElement) {
+            // Prevent flipping if another card is already selected or if currently shuffling
+            if (isShuffling) return;
+            if (isCardSelected && !cardElement.classList.contains('is-flipped')) return;
+
+            cardElement.classList.toggle('is-flipped');
+            isCardSelected = cardElement.classList.contains('is-flipped');
+
+            // Dim and disable the unselected cards to focus on the chosen one
+            const allCards = document.querySelectorAll('.card');
+            allCards.forEach(c => {
+                if (c !== cardElement) {
+                    c.style.opacity = isCardSelected ? '0.3' : '1';
+                    c.style.pointerEvents = isCardSelected ? 'none' : 'auto';
+                    c.style.transition = 'opacity 0.8s ease';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
